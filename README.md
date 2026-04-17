@@ -1,162 +1,160 @@
-# Agent Execution Logging
+# Agent Ledger
 
-A reusable skill and helper-script bundle for enforcing AI execution logging
-across repositories touched by multiple agents, tools, or model variants.
+> Consistent AI execution logs across every agent — Claude Code, Codex, Cursor,
+> and anything else that edits your repo.
 
-It is designed for teams using combinations of:
+[![npm](https://img.shields.io/npm/v/agent-execution-logging.svg)](https://www.npmjs.com/package/agent-execution-logging)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-- Codex
-- Cursor
-- Claude Code
-- Claude CLI
-- other agent frameworks with instruction or rule files
+The problem: multiple AI tools touch the same repo, each with its own idea of
+what "leaving a trail" means. This skill fixes that with one shared contract:
 
-The goal is simple:
-
-- keep one mandatory central AI change log
-- optionally keep per-agent logs
-- register new agent/model identities without manually editing multiple docs
-
-## What You Get
-
-- `SKILL.md`
-  The actual skill definition for Codex-style skill loading.
-- `agents/openai.yaml`
-  UI metadata for Codex skill discovery.
-- `references/integration-snippets.md`
-  Ready-to-paste snippets for `AGENTS.md`, `AGENT.md`, `CLAUDE.md`, and Cursor
-  rules.
-- `scripts/bootstrap_logging_structure.py`
-  Creates the default `docs/` logging structure in any repo.
-- `scripts/register_agent_log.py`
-  Registers a new agent/model log file and updates the registry.
-
-## Default Logging Structure
-
-When a repo does not already have its own structure, this package uses:
-
-```text
-docs/
-  code-base-ai-update-logs.md
-  agent-execution-registry.md
-  agent-logs/
-    <agent-id>.md
-```
+- **One mandatory central AI change log** — every agent appends to the same file
+- **Optional per-agent logs** — for teams that want a paper trail per model
+- **A registry** — new agent/model identities get added in one place, not
+  scattered across `CLAUDE.md`, `AGENTS.md`, `.cursor/rules/`, etc.
 
 ## Install
 
-### npx (recommended — no install required)
+Pick whichever matches your environment — all three install paths use the same
+underlying skill.
+
+### Claude Code (plugin marketplace)
+
+```bash
+/plugin marketplace add s1mpLyy/agent-ledger
+/plugin install agent-execution-logging@agent-ledger
+```
+
+### Any agent (npx — no install required)
 
 ```bash
 npx agent-execution-logging bootstrap --root .
-npx agent-execution-logging register --agent-label "Claude Opus 4.7" --tool-family "Claude Code" --model "Opus 4.7"
-npx agent-execution-logging snippets
-```
-
-Requires Node ≥ 16 and Python 3 on PATH.
-
-### npm global install
-
-```bash
-npm install -g agent-execution-logging
-agent-execution-logging bootstrap --root .
-```
-
-### Codex skill install
-
-Clone or copy this repo, then place the folder at one of:
-
-```bash
-$CODEX_HOME/skills/agent-execution-logging
-```
-
-or:
-
-```bash
-~/.codex/skills/agent-execution-logging
-```
-
-### Generic local install
-
-If you do not use Codex skills directly, keep this repo anywhere you want and
-run the helper scripts from it.
-
-Example:
-
-```bash
-git clone <this-repo-url> agent-execution-logging
-cd agent-execution-logging
-```
-
-## Quick Start
-
-### 1. Bootstrap a target repo
-
-```bash
-python3 scripts/bootstrap_logging_structure.py --root /path/to/target-repo
-```
-
-This creates:
-
-- `docs/code-base-ai-update-logs.md`
-- `docs/agent-execution-registry.md`
-- `docs/agent-logs/`
-
-### 2. Register an agent/model
-
-```bash
-python3 scripts/register_agent_log.py \
-  --root /path/to/target-repo \
+npx agent-execution-logging register \
   --agent-label "Claude Opus 4.7" \
   --tool-family "Claude Code" \
   --model "Opus 4.7"
+npx agent-execution-logging snippets
 ```
 
-Example output:
-
-```text
-registered=claude-code-opus-4-7
-registry=/path/to/target-repo/docs/agent-execution-registry.md
-log_file=/path/to/target-repo/docs/agent-logs/claude-code-opus-4-7.md
-```
-
-### 3. Add the rule text to your agents
-
-Use the snippets in:
-
-[`references/integration-snippets.md`](./references/integration-snippets.md)
-
-## Typical Workflow
-
-1. Install the skill or keep this repo locally.
-2. Bootstrap a target repository once.
-3. Add the instruction snippets to the agent surfaces you use.
-4. Register each new agent/model once.
-5. Require central log updates for every AI-written code change.
-
-## Example Usage
+Requires Node ≥ 16 and Python 3.
 
 ### Codex
 
-Ask:
+Place this repo at `$CODEX_HOME/skills/agent-execution-logging` or
+`~/.codex/skills/agent-execution-logging`. Codex picks it up from
+[`agents/openai.yaml`](./agents/openai.yaml).
+
+### Cursor / generic
+
+Copy the snippets from
+[`references/integration-snippets.md`](./references/integration-snippets.md)
+into `.cursor/rules/` or any instruction file your agent reads.
+
+## What You Get
+
+| File | Purpose |
+| --- | --- |
+| [`SKILL.md`](./SKILL.md) | Skill definition (frontmatter + workflow) |
+| [`skills/agent-execution-logging/SKILL.md`](./skills/agent-execution-logging/SKILL.md) | Claude Code plugin skill (uses `${CLAUDE_PLUGIN_ROOT}`) |
+| [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json) | Claude Code marketplace manifest |
+| [`agents/openai.yaml`](./agents/openai.yaml) | Codex skill metadata |
+| [`scripts/bootstrap_logging_structure.py`](./scripts/bootstrap_logging_structure.py) | Scaffolds the default `docs/` layout |
+| [`scripts/register_agent_log.py`](./scripts/register_agent_log.py) | Registers a new agent/model |
+| [`references/integration-snippets.md`](./references/integration-snippets.md) | Paste-ready rules for AGENTS / CLAUDE / Cursor |
+| [`bin/cli.js`](./bin/cli.js) | Universal Node CLI wrapper |
+
+## Default Logging Structure
 
 ```text
-Use $agent-execution-logging to set up consistent AI logging for this repo.
+docs/
+  code-base-ai-update-logs.md     # central log (mandatory)
+  agent-execution-registry.md      # registry of all known agents
+  agent-logs/
+    <agent-id>.md                  # optional per-agent logs
 ```
 
-### Cursor / Claude / other agents
+If the repo already has an equivalent structure, the skill follows that instead
+of forcing these defaults.
 
-Paste the snippets from
-[`references/integration-snippets.md`](./references/integration-snippets.md)
-into the repo's instruction files or rule system.
+## Quick Start
 
-## Notes
+```bash
+# 1. Bootstrap the logging structure in your repo
+npx agent-execution-logging bootstrap --root .
 
-- This package does not force a repo to use the default structure if it already
-  has a good equivalent.
-- The central log should remain mandatory even if per-agent logs are optional.
+# 2. Register each agent/model that will touch the repo
+npx agent-execution-logging register \
+  --agent-label "Claude Opus 4.7" \
+  --tool-family "Claude Code" \
+  --model "Opus 4.7"
+
+# 3. Paste the instruction snippets into AGENTS.md / CLAUDE.md / .cursor/rules/
+npx agent-execution-logging snippets
+```
+
+From that point on, every AI agent that edits code appends to
+`docs/code-base-ai-update-logs.md` before finishing a task.
+
+## Log Formats
+
+### Central log entry
+
+```md
+## YYYY-MM-DD — Short Title
+
+**What changed:** 1-3 short sentences.
+
+**Files touched:**
+- `path/to/file` — what changed
+
+**Follow-ups:** optional
+```
+
+### Per-agent log entry
+
+```md
+## YYYY-MM-DD — Short Title
+
+**Task:** 1-2 short sentences.
+
+**Files touched:**
+- `path/to/file` — what changed
+
+**Central log:** `docs/code-base-ai-update-logs.md`
+
+**Notes:** optional
+```
+
+## How Agent IDs Are Generated
+
+When you register with `--tool-family` and `--model`, the script produces a
+slug like:
+
+- `claude-code-opus-4-7`
+- `cursor-composer-2-0`
+- `codex-gpt-5-4`
+
+You can override with `--agent-id` if you want a specific slug. The ID shows
+up in the registry row and is the filename under `docs/agent-logs/`.
+
+## Design Notes
+
+- The central log is **mandatory** even when per-agent logs are optional — it's
+  the one source of truth humans scan.
 - The registry exists to avoid maintaining duplicated model lists across
-  multiple instruction files.
+  `CLAUDE.md`, `AGENTS.md`, Cursor rules, etc. Add a model once, reference it
+  everywhere.
+- Both scripts are **idempotent** — safe to run on every task, safe to re-run
+  after a bad edit.
+
+## Development
+
+```bash
+python3 -m pytest -q      # run tests
+claude plugin validate .  # validate marketplace manifest
+npm pack --dry-run        # preview the npm package
+```
 
 ## License
 
