@@ -45,6 +45,23 @@ docs/
 
 ## Install
 
+### npx (recommended — no install required)
+
+```bash
+npx agent-execution-logging bootstrap --root .
+npx agent-execution-logging register --agent-label "Claude Opus 4.7" --tool-family "Claude Code" --model "Opus 4.7"
+npx agent-execution-logging snippets
+```
+
+Requires Node ≥ 16 and Python 3 on PATH.
+
+### npm global install
+
+```bash
+npm install -g agent-execution-logging
+agent-execution-logging bootstrap --root .
+```
+
 ### Codex skill install
 
 Clone or copy this repo, then place the folder at one of:
