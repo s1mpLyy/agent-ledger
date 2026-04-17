@@ -2,27 +2,11 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
-
-CENTRAL_LOG_CONTENT = """# Codebase AI update logs
-
-Running log of AI-assisted changes to this repository. Append new entries here
-instead of creating one-off markdown files.
-"""
-
-
-REGISTRY_CONTENT = """# Agent Execution Registry
-
-This registry tracks per-agent execution logs. The central change log at
-`docs/code-base-ai-update-logs.md` remains mandatory for every AI-written code
-change.
-
-## Registered Agents
-
-| Agent | ID | Log file | Notes |
-| --- | --- | --- | --- |
-"""
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _common import CENTRAL_LOG_TEMPLATE, REGISTRY_TEMPLATE
 
 
 def ensure_file(path: Path, content: str) -> None:
@@ -46,8 +30,8 @@ def main() -> None:
     docs_dir.mkdir(parents=True, exist_ok=True)
     agent_logs_dir.mkdir(parents=True, exist_ok=True)
 
-    ensure_file(docs_dir / "code-base-ai-update-logs.md", CENTRAL_LOG_CONTENT)
-    ensure_file(docs_dir / "agent-execution-registry.md", REGISTRY_CONTENT)
+    ensure_file(docs_dir / "code-base-ai-update-logs.md", CENTRAL_LOG_TEMPLATE)
+    ensure_file(docs_dir / "agent-execution-registry.md", REGISTRY_TEMPLATE)
 
     print(f"central_log={docs_dir / 'code-base-ai-update-logs.md'}")
     print(f"registry={docs_dir / 'agent-execution-registry.md'}")

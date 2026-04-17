@@ -3,26 +3,18 @@ from __future__ import annotations
 
 import argparse
 import re
-from datetime import date
+import sys
+from datetime import datetime, timezone
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _common import REGISTRY_TEMPLATE
 
 
 def slugify(value: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", value.strip().lower())
     slug = re.sub(r"-{2,}", "-", slug).strip("-")
     return slug or "unknown-agent"
-
-
-def build_registry_content() -> str:
-    return (
-        "# Agent Execution Registry\n\n"
-        "This registry tracks per-agent execution logs. The central change log at\n"
-        "`docs/code-base-ai-update-logs.md` remains mandatory for every AI-written\n"
-        "code change.\n\n"
-        "## Registered Agents\n\n"
-        "| Agent | ID | Log file | Notes |\n"
-        "| --- | --- | --- | --- |\n"
-    )
 
 
 def build_log_file_content(
@@ -65,11 +57,10 @@ def ensure_registry_row(
 ) -> None:
     if not registry_path.exists():
         registry_path.parent.mkdir(parents=True, exist_ok=True)
-        registry_path.write_text(build_registry_content())
+        registry_path.write_text(REGISTRY_TEMPLATE)
 
     content = registry_path.read_text()
-    row_key = f"| {agent_label} | `{agent_id}` |"
-    if row_key in content:
+    if re.search(rf"\|\s*`{re.escape(agent_id)}`\s*\|", content):
         return
 
     row = (
@@ -77,6 +68,8 @@ def ensure_registry_row(
         f"[{log_file_relative_to_docs}](./{log_file_relative_to_docs}) | "
         f"{notes or 'Registered agent log'} |\n"
     )
+    if not content.endswith("\n"):
+        content += "\n"
     registry_path.write_text(content + row)
 
 
@@ -104,7 +97,7 @@ def main() -> None:
 
     log_dir.mkdir(parents=True, exist_ok=True)
     log_path = log_dir / f"{agent_id}.md"
-    today = date.today().isoformat()
+    today = datetime.now(timezone.utc).date().isoformat()
 
     if not log_path.exists():
         log_path.write_text(

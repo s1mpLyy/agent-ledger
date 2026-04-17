@@ -67,7 +67,7 @@ run the helper scripts from it.
 Example:
 
 ```bash
-git clone https://github.com/<your-org>/agent-execution-logging.git
+git clone <this-repo-url> agent-execution-logging
 cd agent-execution-logging
 ```
 

@@ -18,6 +18,9 @@ python3 scripts/bootstrap_logging_structure.py --root /path/to/repo
 
 Then add one instruction snippet to each agent surface you actually use.
 
+For the exact log entry format, see the "Central Log Format" and
+"Per-Agent Log Format" sections in [`SKILL.md`](../SKILL.md).
+
 ## Generic Instruction Snippet
 
 ```md

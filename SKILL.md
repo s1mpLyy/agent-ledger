@@ -53,10 +53,11 @@ Prefer, in this order:
 3. Tool family plus model name
 4. Safe fallback slug
 
-Stable examples:
+Stable examples (match what `register_agent_log.py` emits when both
+`--tool-family` and `--model` are passed):
 
-- `cursor-composer-2`
-- `claude-opus-4-7`
+- `cursor-composer-2-0`
+- `claude-code-opus-4-7`
 - `codex-gpt-5-4`
 
 ### 3. Bootstrap the repo if needed
