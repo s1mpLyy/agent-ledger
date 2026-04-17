@@ -1,0 +1,7 @@
+interface:
+  display_name: "Execution Logging"
+  short_description: "Track AI code changes across agents"
+  default_prompt: "Use $agent-execution-logging to keep central and per-agent execution logs in sync for this repository."
+
+policy:
+  allow_implicit_invocation: true
