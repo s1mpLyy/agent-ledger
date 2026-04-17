@@ -1,0 +1,26 @@
+{
+  "name": "agent-ledger",
+  "owner": {
+    "name": "s1mpLyy"
+  },
+  "metadata": {
+    "description": "Skills for standardizing AI execution logs across Claude Code, Codex, Cursor, and other agent environments.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "agent-execution-logging",
+      "source": "./",
+      "description": "Enforce consistent AI execution logs — central change log + optional per-agent logs — across any agent environment.",
+      "version": "1.0.0",
+      "author": {
+        "name": "s1mpLyy"
+      },
+      "homepage": "https://github.com/s1mpLyy/agent-ledger",
+      "repository": "https://github.com/s1mpLyy/agent-ledger",
+      "license": "MIT",
+      "keywords": ["logging", "ai", "agents", "codex", "cursor", "claude"],
+      "category": "productivity"
+    }
+  ]
+}
