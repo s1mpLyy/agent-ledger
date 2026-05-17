@@ -13,6 +13,8 @@ what "leaving a trail" means. This skill fixes that with one shared contract:
 - **Optional per-agent logs** — for teams that want a paper trail per model
 - **A registry** — new agent/model identities get added in one place, not
   scattered across `CLAUDE.md`, `AGENTS.md`, `.cursor/rules/`, etc.
+- **A log-entry helper** — append correctly-formatted, dated entries instead
+  of hand-editing markdown
 
 ## Install
 
