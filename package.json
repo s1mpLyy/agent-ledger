@@ -19,6 +19,7 @@
     "scripts/_common.py",
     "scripts/bootstrap_logging_structure.py",
     "scripts/register_agent_log.py",
+    "scripts/add_log_entry.py",
     "references/",
     "agents/",
     "SKILL.md"

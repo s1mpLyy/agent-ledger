@@ -56,11 +56,12 @@ into `.cursor/rules/` or any instruction file your agent reads.
 | File | Purpose |
 | --- | --- |
 | [`SKILL.md`](./SKILL.md) | Skill definition (frontmatter + workflow) |
-| [`skills/agent-execution-logging/SKILL.md`](./skills/agent-execution-logging/SKILL.md) | Claude Code plugin skill (uses `${CLAUDE_PLUGIN_ROOT}`) |
+| [`skills/agent-execution-logging/SKILL.md`](./skills/agent-execution-logging/SKILL.md) | Claude Code plugin copy — kept byte-identical to `SKILL.md` (CI-checked) |
 | [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json) | Claude Code marketplace manifest |
 | [`agents/openai.yaml`](./agents/openai.yaml) | Codex skill metadata |
 | [`scripts/bootstrap_logging_structure.py`](./scripts/bootstrap_logging_structure.py) | Scaffolds the default `docs/` layout |
 | [`scripts/register_agent_log.py`](./scripts/register_agent_log.py) | Registers a new agent/model |
+| [`scripts/add_log_entry.py`](./scripts/add_log_entry.py) | Appends a formatted entry to the central/per-agent log |
 | [`references/integration-snippets.md`](./references/integration-snippets.md) | Paste-ready rules for AGENTS / CLAUDE / Cursor |
 | [`bin/cli.js`](./bin/cli.js) | Universal Node CLI wrapper |
 
@@ -91,6 +92,13 @@ npx agent-execution-logging register \
 
 # 3. Paste the instruction snippets into AGENTS.md / CLAUDE.md / .cursor/rules/
 npx agent-execution-logging snippets
+
+# 4. Append a log entry at the end of any task that edits files
+npx agent-execution-logging entry \
+  --title "Fix login redirect" \
+  --summary "Corrected the post-login redirect target." \
+  --file "src/auth.py::fixed redirect URL" \
+  --agent-id claude-code-opus-4-7
 ```
 
 From that point on, every AI agent that edits code appends to

@@ -1,6 +1,6 @@
 ---
 name: agent-execution-logging
-description: Use this skill when a repository needs consistent AI execution logs across Codex, Cursor, Claude Code, Claude CLI, or other agent environments. It standardizes a mandatory central change log, optional per-agent logs, and a lightweight registration flow for new agent or model identities.
+description: Use when multiple AI agents (Codex, Cursor, Claude Code, Claude CLI, or others) edit the same repository and code changes need a consistent, auditable trail — or before finishing any file-editing task in a repo that already keeps AI execution logs.
 ---
 
 # Agent Execution Logging
@@ -15,6 +15,13 @@ leave a clear, repeatable execution trail.
 - Teams want one central AI change log plus optional per-agent logs
 - New agent or model identities should be added without hand-editing multiple
   instruction files every time
+
+## When NOT to Use
+
+- Read-only exploration, questions, or reviews that change no files
+- Repos with an existing, enforced changelog/ADR process that already covers
+  AI changes — extend that instead of layering a second system
+- Single-developer scratch repos where no audit trail is wanted
 
 ## Default Layout
 
@@ -65,12 +72,12 @@ Stable examples (match what `register_agent_log.py` emits when both
 If the repo has no central log or registry yet, run:
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/bootstrap_logging_structure.py --root .
+python3 ${CLAUDE_PLUGIN_ROOT:-.}/scripts/bootstrap_logging_structure.py --root .
 ```
 
 That creates the default `docs/` logging structure. It does not rewrite the
 repo's instruction files for you; use the integration snippets in
-`${CLAUDE_PLUGIN_ROOT}/references/integration-snippets.md` for that one-time
+`${CLAUDE_PLUGIN_ROOT:-.}/references/integration-snippets.md` for that one-time
 setup.
 
 ### 4. Register new agents when needed
@@ -79,7 +86,7 @@ If the repo uses per-agent logs and the current agent is missing from the
 registry, run:
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/register_agent_log.py \
+python3 ${CLAUDE_PLUGIN_ROOT:-.}/scripts/register_agent_log.py \
   --root . \
   --agent-label "Claude Opus 4.7" \
   --tool-family "Claude Code" \
@@ -90,13 +97,37 @@ This creates the per-agent file and adds the registry row.
 
 ### 5. Log before closing any write task
 
-For any task that edits files:
+For any task that edits files, append a dated entry. Use the helper so the
+format and date are consistent:
 
-- append a dated entry to the central log
-- append a matching entry to the per-agent log if the repo uses one
-- update instruction or plan docs that would otherwise become misleading
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT:-.}/scripts/add_log_entry.py \
+  --root . \
+  --title "Short title" \
+  --summary "1-3 sentences on what changed." \
+  --file "path/to/file::what changed" \
+  --file "path/to/other::what changed" \
+  --agent-id claude-code-opus-4-7
+```
+
+- The central entry is always written.
+- Pass `--agent-id` only if the repo uses per-agent logs; it appends a matching
+  entry to that agent's file (the agent must already be registered).
+- Also update instruction or plan docs that would otherwise become misleading.
 
 Read-only exploration does not require log entries.
+
+## Handling Concurrent Writes
+
+The central log is a single append-only file, so two agents working in
+parallel branches will both append and hit a merge conflict.
+
+- **Never delete another agent's entry to resolve a conflict.** Keep both.
+- Order entries oldest-first within a date; newest dates go at the bottom.
+- If two entries collide on the same task, merge them into one entry rather
+  than dropping either side.
+- Append entries as the *last* action before finishing, so the conflict window
+  stays small.
 
 ## Central Log Format
 
@@ -133,12 +164,24 @@ Use:
 
 ## Resources
 
-- Read `${CLAUDE_PLUGIN_ROOT}/references/integration-snippets.md` for
+- Read `${CLAUDE_PLUGIN_ROOT:-.}/references/integration-snippets.md` for
   AGENTS/CLAUDE/Cursor setup text.
-- Run `${CLAUDE_PLUGIN_ROOT}/scripts/bootstrap_logging_structure.py` to
+- Run `${CLAUDE_PLUGIN_ROOT:-.}/scripts/bootstrap_logging_structure.py` to
   scaffold the default docs layout in a repo.
-- Run `${CLAUDE_PLUGIN_ROOT}/scripts/register_agent_log.py` to add a new
+- Run `${CLAUDE_PLUGIN_ROOT:-.}/scripts/register_agent_log.py` to add a new
   per-agent log file and registry entry.
+- Run `${CLAUDE_PLUGIN_ROOT:-.}/scripts/add_log_entry.py` to append a
+  consistently formatted entry to the central (and per-agent) log.
+
+## Common Mistakes
+
+- Logging only in the per-agent file and skipping the central log. The central
+  log is the one source humans scan — it is never optional.
+- Writing one entry per file instead of one entry per task.
+- Vague entries ("updated code"). Name the files and what changed in each.
+- Adding a new model to `CLAUDE.md` and `AGENTS.md` separately instead of
+  registering it once.
+- Logging read-only exploration. Only file-editing tasks need entries.
 
 ## Guardrails
 

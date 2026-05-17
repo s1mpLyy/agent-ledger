@@ -74,6 +74,19 @@ python3 scripts/register_agent_log.py \
   --model "Opus 4.7"
 ```
 
+## Append a Log Entry
+
+```bash
+python3 scripts/add_log_entry.py \
+  --root /path/to/repo \
+  --title "Fix login redirect" \
+  --summary "Corrected the post-login redirect target." \
+  --file "src/auth.py::fixed redirect URL" \
+  --agent-id claude-code-opus-4-7
+```
+
+`--agent-id` is optional; pass it only when the repo uses per-agent logs.
+
 ## Codex Install
 
 Place this folder at:

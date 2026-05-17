@@ -10,6 +10,7 @@ const REFS = path.resolve(__dirname, "..", "references");
 const COMMANDS = {
   bootstrap: path.join(SCRIPTS, "bootstrap_logging_structure.py"),
   register: path.join(SCRIPTS, "register_agent_log.py"),
+  entry: path.join(SCRIPTS, "add_log_entry.py"),
   snippets: null,
 };
 
@@ -22,11 +23,13 @@ Usage:
 Commands:
   bootstrap   Create the default docs/ logging structure in a repo
   register    Register a new agent/model log file
+  entry       Append a dated entry to the central (and per-agent) log
   snippets    Print integration snippets for AGENTS.md / CLAUDE.md / Cursor
 
 Examples:
   npx agent-execution-logging bootstrap --root .
   npx agent-execution-logging register --agent-label "Claude Opus 4.7" --tool-family "Claude Code" --model "Opus 4.7"
+  npx agent-execution-logging entry --title "Fix login" --summary "Corrected redirect." --file "src/auth.py::fixed URL"
   npx agent-execution-logging snippets
 
 Options for bootstrap:
@@ -39,6 +42,16 @@ Options for register:
   --tool-family   e.g. "Claude Code", "Cursor", "Codex"
   --model         e.g. "Opus 4.7", "GPT-5"
   --notes         Optional notes for the registry row
+
+Options for entry:
+  --root          Repo root (default: current directory)
+  --title         Short entry title (required)
+  --summary       1-3 sentences on what changed (required)
+  --file          Touched file as PATH[::DESCRIPTION]; repeatable (required)
+  --agent-id      Also append to this per-agent log (must be registered)
+  --follow-ups    Optional follow-up note for the central entry
+  --notes         Optional note for the per-agent entry
+  --date          Entry date YYYY-MM-DD (default: today)
 `.trim();
 
 function findPython() {
